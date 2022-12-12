@@ -23,278 +23,293 @@
     <li class="nav-item">
       <a class="nav-link text-white" href="../photo/index.html">Модель</a>
     </li>
+    <li class="nav-item">
+      <a class="nav-link text-white" href="../test/index.html">Колаб test</a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link text-white" href="../housing/index.html">Колаб housing</a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link text-white" href="../regression/index.html">Колаб регрессия</a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link text-white" href="../visual/index.html">Колаб визуализация</a>
+    </li>
     <button type="button" class="btn btn-succes text-white px-3" type="submit" onClick="location.href='https://www.youtube.com/watch?v=kb8mcYwbFj8&ab_channel=GloAcademy'">YouTube</button> 
   </ul>
 
 <div class="container">
 <pre>
 <code>
-#----------------------------Часть 1.1 Подготовка обучающей  и тестовой выборок ----------------------------
-#Импорт библиотек
-import pandas as pd
-import matplotlib.pyplot as plt
-import numpy as np
-import time
-from colorama import Fore, Back, Style
-from sklearn import datasets, linear_model
-
-#Создаем необходимые списки
-from sklearn.linear_model import LinearRegression
-
-timelists = list()
-newmatrix1lists = list()
-newmatrix2lists = list()
-sestimelist = list()
-
-#Загрузка баз данных
-rd_test = pd.read_csv("test_ses.csv", delimiter=",")
-df_test = pd.DataFrame(rd_test)
-rd_train = pd.read_csv("train_ses.csv", delimiter=",")
-df_train = pd.DataFrame(rd_train)
-def dropnulls():
-    #Удаление пустых значений
-    df_test.fillna(0)
-    df_train.fillna(0)
-    print("Произвел удаление пустых значений.")
-def sortdb():
-    #Сортировка по файлу
-    df_test.describe()
-    df_train.describe()
-    print("Произвел сортировку по файлу.")
-def sortsess():
-    #Сортируем Таблицы по номеру ссесий
-    df_test.sort_values('session_id')
-    df_train.sort_values('session_id')
-    print("Произвел сортировку таблиц по номеру сессий.")
-
-#----------------------------Часть 1.2 Работа с разреженным форматом данных----------------------------
-
-#Создадим метод с матрицей для отражения "мешка сайтов", для базы test_ses
-def visitsits_dftest():
-    for inds in range(10):
-        df_test['session_id'][inds]
-        sits_index = df_test['site1'][inds]
-        sites_session = df_test['session_id'][inds]
-        new_matix = np.matrix(sits_index, sites_session)
-        newmatrix1lists.append(new_matix)
-    return newmatrix1lists
-
-
-#Создадим метод с матрицей для отражения "мешка сайтов", для базы train_ses
-def visitsits_dftrain():
-    for inds in range(10):
-        df_train['session_id'][inds]
-        sits_index = df_test['site1'][inds]
-        sites_session = df_test['session_id'][inds]
-        new_matix = np.matrix(sits_index, sites_session)
-        newmatrix2lists.append(new_matix)
-    return newmatrix2lists
-
-
-#Создадим метод с матрицей для отражения "мешка сайтов", раномные значения
-def visitsits_dftrain_rand():
-    for inde in range(10):
-        df_ands = pd.DataFrame(np.matrix(np.random.rand(1, 1)), columns=[df_train['site1'][inde]],
-                               index=[df_train['session_id'][inde]])
-        print(df_ands)
-#Данный метод отражает Сайт, Сесию, и имеется ли дублкат сессий на данном сайте. (Session: Сессия Sits1Index: Индекс сайта Duplicate: True/False)
-def sutes_session_dub():
-    sites_session = 'session_id'
-    for inds in range(10):
-        ses = df_train['session_id'][inds]
-        sits1_index = df_test['site1'][inds]
-        sits2_index = df_test['site2'][inds]
-        sits3_index = df_test['site3'][inds]
-        sits4_index = df_test['site4'][inds]
-        sits5_index = df_test['site5'][inds]
-        sits6_index = df_test['site6'][inds]
-        sits7_index = df_test['site7'][inds]
-        sits8_index = df_test['site8'][inds]
-        sits9_index = df_test['site9'][inds]
-        sits10_index = df_test['site10'][inds]
-        sitedub1 = df_test.duplicated(subset=[sites_session, 'site1']).any()
-        sitedub2 = df_test.duplicated(subset=[sites_session, 'site2']).any()
-        sitedub3 = df_test.duplicated(subset=[sites_session, 'site3']).any()
-        sitedub4 = df_test.duplicated(subset=[sites_session, 'site4']).any()
-        sitedub5 = df_test.duplicated(subset=[sites_session, 'site5']).any()
-        sitedub6 = df_test.duplicated(subset=[sites_session, 'site6']).any()
-        sitedub7 = df_test.duplicated(subset=[sites_session, 'site7']).any()
-        sitedub8 = df_test.duplicated(subset=[sites_session, 'site8']).any()
-        sitedub9 = df_test.duplicated(subset=[sites_session, 'site9']).any()
-        sitedub10 = df_test.duplicated(subset=[sites_session, 'site10']).any()
-
-        print(Fore.YELLOW + "Session: {}".format(ses)
-              +" \nSits1Index: {}".format(sits1_index)+ " Duplicate: {}".format(sitedub1)
-              +" \nSits2Index: {}".format(sits2_index)+ " Duplicate: {}".format(sitedub2)
-              +" \nSits3Index: {}".format(sits3_index)+ " Duplicate: {}".format(sitedub3)
-              +" \nSits4Index: {}".format(sits4_index)+ " Duplicate: {}".format(sitedub4)
-              +" \nSits5Index: {}".format(sits5_index)+ " Duplicate: {}".format(sitedub5)
-              +" \nSits6Index: {}".format(sits6_index)+ " Duplicate: {}".format(sitedub6)
-              +" \nSits7Index: {}".format(sits7_index)+ " Duplicate: {}".format(sitedub7)
-              +" \nSits8Index: {}".format(sits8_index)+ " Duplicate: {}".format(sitedub8)
-              +" \nSits9Index: {}".format(sits9_index)+ " Duplicate: {}".format(sitedub9)
-              +" \nSits10Index: {}".format(sits10_index)+ " Duplicate: {}".format(sitedub10)
-              )
-
-
-#----------------------------1.3 Визуальный анализ данных----------------------------
-#Отрисуем график посещений сайтов, чтобы понять куда чаще заходил пользователь. (База : test_ses.csv)
-def sist_check_df_test():
-    plt.plot(df_test['site1'], color="b")
-    plt.plot(df_test['site2'], color="g")
-    plt.plot(df_test['site3'], color="r")
-    plt.plot(df_test['site4'], color="c")
-    plt.plot(df_test['site5'], color="m")
-    plt.plot(df_test['site6'], color="y")
-    plt.plot(df_test['site7'], color="silver")
-    plt.plot(df_test['site8'], color="wheat")
-    plt.plot(df_test['site9'], color="lime")
-    plt.plot(df_test['site10'], color="violet")
-    plt.show()
-#Отрисуем график посещений сайтов, чтобы понять куда чаще заходил пользователь. (База : train_ses.csv)
-def sist_check_df_train():
-    plt.plot(df_train['site1'], color="b")
-    plt.plot(df_train['site2'], color="g")
-    plt.plot(df_train['site3'], color="r")
-    plt.plot(df_train['site4'], color="c")
-    plt.plot(df_train['site5'], color="m")
-    plt.plot(df_train['site6'], color="y")
-    plt.plot(df_train['site7'], color="silver")
-    plt.plot(df_train['site8'], color="wheat")
-    plt.plot(df_train['site9'], color="lime")
-    plt.plot(df_train['site10'], color="violet")
-    plt.show()
-
-
-#----------------------------1.4 Конструирование признаков (Feature Engineering)----------------------------
-#Создаем метод new_time, для более удобной и компактного преобразования времени во float.
-def new_time(database,table_name):
-    # Преобразуем время в значение float
-    dfsizer = 0
-    try:
-        while (dfsizer <= database.size):
-                t = time.strptime(database[table_name][dfsizer], '%Y-%m-%d %H:%M:%S')
-                new_time = time.strftime('%Y%m%d %H%M%S', t)
-                database[table_name] = database[table_name].replace(database[table_name][dfsizer], new_time)
-                timelists.append(new_time)
-                dfsizer += 1
-    except Exception as ex:
-        pass
-    return ''.join(timelists)
-
-def ses_time(database,table_name):
-    try:
-        for inds in range(database.size):
-            sestimelist.append(
-                str(database['session_id'][inds]) + "-" + str(database[table_name][inds]))
-    except Exception as ex:
-        pass
-    return ''.join(sestimelist)
-
-def target():
-    for inds in range(df_train.size):
-        if(df_train['target'][inds] == 1):
-            print("Сесия: {}".format(df_train['session_id']) + " Сайты: {}".format(df_train['site1'])+" / {}".format(df_train['site2'])+" / {}".format(df_train['site3'])+" / {}".format(df_train['site4'])+" / {}".format(df_train['site5'])+" / {}".format(df_train['site6'])+" / {}".format(df_train['site7'])+" / {}".format(df_train['site8'])+" / {}".format(df_train['site9'])+" / {}".format(df_train['site10']))
-
-def linrg():
-    # Загружаем данные только с двумя признаками
-    length = 10
-    x = np.arange(length, dtype=float).reshape((length, 1))
-    y = x + (np.random.rand(length) * 10).reshape((length, 1))
-
-    x = x.reshape(length, 1)
-    y = y.reshape(length, 1)
-    regr = linear_model.LinearRegression()
-    regr.fit(x, y)
-
-
-    plt.scatter(x, y, color='black')
-    plt.plot(x, regr.predict(x), color='blue', linewidth=3)
-    plt.xticks(())
-    plt.yticks(())
-    plt.show()
-
-#Консольный бот для работы с приложением
-if __name__ == '__main__':
-    print(Fore.GREEN +"------------------Запуск консольной панели для выполнения результатов------------------\n")
-    print(Fore.GREEN +"\nСписок возможностей:\n"
-          + "\n1 - Удалить строки имеющие пустые значения."
-          + "\n2 - Выполнить сортировку по файлу."
-          + "\n3 - Выполнить сортировку таблицы по столбцу 'session_id'"
-          + "\n4 - Отражение матрицы  (мешка сайтов)."
-          + "\n5 - Вывести имеются ли дубликаты в сессий сайта."
-          + "\n6 - Нарисовать график посещений сайта."
-          + "\n7 - Изминение вида даты в число ГГГГММ (Из всей таблицы)"
-          + "\n8 - Признак Сессия-Дата входа (Из всей таблицы)"
-          + "\n9 - Отражение матрицы (Рандомные значения) (мешка сайтов)."
-          + "\n10 - Сайты которые посещал злоумышленник."
-          + "\n11 - Выполнение линейной регрессии."
-          )
-    joined = input("Введите выбранный пункт:")
-    if(joined == "1"):
-        dropnulls()
-    if(joined == "2"):
-        sortdb()
-    if(joined == "3"):
-        sortsess()
-    if(joined == "4"):
-        dbcheck = input(Fore.CYAN +"Выберете Базу\n"
-                        +"\n1 - test_ses"
-                        +"\n2 - train_ses"
-                        + " :"
-                        )
-        if(dbcheck == "1"):
-            print(visitsits_dftest)
-            newmatrix1lists.clear()
-        if(dbcheck == "2"):
-            print(visitsits_dftrain)
-            newmatrix2lists.clear()
-    if(joined == "5"):
-        sutes_session_dub()
-    if(joined == "6"):
-        dbcheckplot = input(Fore.CYAN +"Выберете Базу\n"
-                        +"\n1 - test_ses"
-                        +"\n2 - train_ses"
-                        + " :"
-                        )
-        if(dbcheckplot == "1"):
-            sist_check_df_test()
-        if(sist_check_df_train == "2"):
-            sist_check_df_test()
-    if(joined == "7"):
-        dbchecks = input(Fore.CYAN +"Выберете Базу\n"
-                        +"\n1 - test_ses"
-                        +"\n2 - train_ses"
-                        + " :"
-                        )
-        if(dbchecks == "1"):
-            timesr = input("Введите название таблицы time's (Допустимые значения 'time1-time10')")
-            print(Fore.MAGENTA+new_time(df_test, timesr))
-        if(dbchecks == "2"):
-            timesr = input("Введите название таблицы time's (Допустимые значения 'time1-time10')")
-            print(Fore.MAGENTA+new_time(df_train, timesr))
-    if(joined == "8"):
-        dbchecks = input(Fore.CYAN +"Выберете Базу\n"
-                        +"\n1 - test_ses"
-                        +"\n2 - train_ses"
-                        + " :"
-                        )
-        if(dbchecks == "1"):
-            timesr = input("Введите название таблицы time's (Допустимые значения 'time1-time10')")
-            print(Fore.MAGENTA+ses_time(df_test, timesr))
-        if(dbchecks == "2"):
-            timesr = input("Введите название таблицы time's (Допустимые значения 'time1-time10')")
-            print(Fore.MAGENTA+ses_time(df_train, timesr))
-    if(joined == "9"):
-            visitsits_dftrain_rand()
-    if(joined == "10"):
-            target()
-    if(joined == "11"):
-            linrg()
-    if((joined != "1") and (joined != "2") and (joined != "3") and (joined != "4") and (joined != "5") and (joined != "6") and (joined != "7") and (joined != "8") and (joined != "9") and (joined != "10") and (joined != "11")):
-        print(Fore.RED+"Вы ввели неподдерживаемый символ."+Fore.BLUE+"\nПерезапустите программу.")
+  #----------------------------Часть 1.1 Подготовка обучающей  и тестовой выборок ----------------------------
+  #Импорт библиотек
+  import pandas as pd
+  import matplotlib.pyplot as plt
+  import numpy as np
+  import time
+  from colorama import Fore, Back, Style
+  from sklearn import linear_model
+  from sklearn import datasets
+  
+  #Создаем необходимые списки
+  from sklearn.linear_model import LinearRegression
+  
+  timelists = list()
+  newmatrix1lists = list()
+  newmatrix2lists = list()
+  sestimelist = list()
+  
+  #Загрузка баз данных
+  rd_test = pd.read_csv("test_ses.csv", delimiter=",")
+  df_test = pd.DataFrame(rd_test)
+  rd_train = pd.read_csv("train_ses.csv", delimiter=",")
+  df_train = pd.DataFrame(rd_train)
+  
+  def dropnulls():
+      df_test.fillna(0)
+      df_train.fillna(0)
+      print("Произвел удаление пустых значений.")
+  
+  def sortdb():
+      #Сортировка по файлу
+      df_test.describe()
+      df_train.describe()
+      print("Произвел сортировку по файлу.")
+  def sortsess():
+      #Сортируем Таблицы по номеру ссесий
+      df_test.sort_values('session_id')
+      df_train.sort_values('session_id')
+      print("Произвел сортировку таблиц по номеру сессий.")
+  
+  #----------------------------Часть 1.2 Работа с разреженным форматом данных----------------------------
+  
+  #Создадим метод с матрицей для отражения "мешка сайтов", для базы test_ses
+  def visitsits_dftest():
+      for inds in range(10):
+          df_test['session_id'][inds]
+          sits_index = df_test['site1'][inds]
+          sites_session = df_test['session_id'][inds]
+          new_matix = np.matrix(sits_index, sites_session)
+          newmatrix1lists.append(new_matix)
+      return newmatrix1lists
+  
+  
+  #Создадим метод с матрицей для отражения "мешка сайтов", для базы train_ses
+  def visitsits_dftrain():
+      for inds in range(10):
+          df_train['session_id'][inds]
+          sits_index = df_test['site1'][inds]
+          sites_session = df_test['session_id'][inds]
+          new_matix = np.matrix(sits_index, sites_session)
+          newmatrix2lists.append(new_matix)
+      return newmatrix2lists
+  
+  
+  #Создадим метод с матрицей для отражения "мешка сайтов", раномные значения
+  def visitsits_dftrain_rand():
+      for inde in range(10):
+          df_ands = pd.DataFrame(np.matrix(np.random.rand(1, 1)), columns=[df_train['site1'][inde]],
+                                 index=[df_train['session_id'][inde]])
+          print(df_ands)
+  #Данный метод отражает Сайт, Сесию, и имеется ли дублкат сессий на данном сайте. (Session: Сессия Sits1Index: Индекс сайта Duplicate: True/False)
+  def sutes_session_dub():
+      sites_session = 'session_id'
+      for inds in range(10):
+          ses = df_train['session_id'][inds]
+          sits1_index = df_test['site1'][inds]
+          sits2_index = df_test['site2'][inds]
+          sits3_index = df_test['site3'][inds]
+          sits4_index = df_test['site4'][inds]
+          sits5_index = df_test['site5'][inds]
+          sits6_index = df_test['site6'][inds]
+          sits7_index = df_test['site7'][inds]
+          sits8_index = df_test['site8'][inds]
+          sits9_index = df_test['site9'][inds]
+          sits10_index = df_test['site10'][inds]
+          sitedub1 = df_test.duplicated(subset=[sites_session, 'site1']).any()
+          sitedub2 = df_test.duplicated(subset=[sites_session, 'site2']).any()
+          sitedub3 = df_test.duplicated(subset=[sites_session, 'site3']).any()
+          sitedub4 = df_test.duplicated(subset=[sites_session, 'site4']).any()
+          sitedub5 = df_test.duplicated(subset=[sites_session, 'site5']).any()
+          sitedub6 = df_test.duplicated(subset=[sites_session, 'site6']).any()
+          sitedub7 = df_test.duplicated(subset=[sites_session, 'site7']).any()
+          sitedub8 = df_test.duplicated(subset=[sites_session, 'site8']).any()
+          sitedub9 = df_test.duplicated(subset=[sites_session, 'site9']).any()
+          sitedub10 = df_test.duplicated(subset=[sites_session, 'site10']).any()
+  
+          print(Fore.YELLOW + "Session: {}".format(ses)
+                +" \nSits1Index: {}".format(sits1_index)+ " Duplicate: {}".format(sitedub1)
+                +" \nSits2Index: {}".format(sits2_index)+ " Duplicate: {}".format(sitedub2)
+                +" \nSits3Index: {}".format(sits3_index)+ " Duplicate: {}".format(sitedub3)
+                +" \nSits4Index: {}".format(sits4_index)+ " Duplicate: {}".format(sitedub4)
+                +" \nSits5Index: {}".format(sits5_index)+ " Duplicate: {}".format(sitedub5)
+                +" \nSits6Index: {}".format(sits6_index)+ " Duplicate: {}".format(sitedub6)
+                +" \nSits7Index: {}".format(sits7_index)+ " Duplicate: {}".format(sitedub7)
+                +" \nSits8Index: {}".format(sits8_index)+ " Duplicate: {}".format(sitedub8)
+                +" \nSits9Index: {}".format(sits9_index)+ " Duplicate: {}".format(sitedub9)
+                +" \nSits10Index: {}".format(sits10_index)+ " Duplicate: {}".format(sitedub10)
+                )
+  
+  
+  #----------------------------1.3 Визуальный анализ данных----------------------------
+  #Отрисуем график посещений сайтов, чтобы понять куда чаще заходил пользователь. (База : test_ses.csv)
+  def sist_check_df_test():
+      plt.plot(df_test['site1'], color="b")
+      plt.plot(df_test['site2'], color="g")
+      plt.plot(df_test['site3'], color="r")
+      plt.plot(df_test['site4'], color="c")
+      plt.plot(df_test['site5'], color="m")
+      plt.plot(df_test['site6'], color="y")
+      plt.plot(df_test['site7'], color="silver")
+      plt.plot(df_test['site8'], color="wheat")
+      plt.plot(df_test['site9'], color="lime")
+      plt.plot(df_test['site10'], color="violet")
+      plt.show()
+  #Отрисуем график посещений сайтов, чтобы понять куда чаще заходил пользователь. (База : train_ses.csv)
+  def sist_check_df_train():
+      plt.plot(df_train['site1'], color="b")
+      plt.plot(df_train['site2'], color="g")
+      plt.plot(df_train['site3'], color="r")
+      plt.plot(df_train['site4'], color="c")
+      plt.plot(df_train['site5'], color="m")
+      plt.plot(df_train['site6'], color="y")
+      plt.plot(df_train['site7'], color="silver")
+      plt.plot(df_train['site8'], color="wheat")
+      plt.plot(df_train['site9'], color="lime")
+      plt.plot(df_train['site10'], color="violet")
+      plt.show()
+  
+  
+  #----------------------------1.4 Конструирование признаков (Feature Engineering)----------------------------
+  #Создаем метод new_time, для более удобной и компактного преобразования времени во float.
+  def new_time(database,table_name):
+      # Преобразуем время в значение float
+      dfsizer = 0
+      try:
+          while (dfsizer <= database.size):
+                  t = time.strptime(database[table_name][dfsizer], '%Y-%m-%d %H:%M:%S')
+                  new_time = time.strftime('%Y%m%d %H%M%S', t)
+                  database[table_name] = database[table_name].replace(database[table_name][dfsizer], new_time)
+                  timelists.append(new_time)
+                  dfsizer += 1
+      except Exception as ex:
+          pass
+      return ''.join(timelists)
+  
+  def ses_time(database,table_name):
+      try:
+          for inds in range(database.size):
+              sestimelist.append(
+                  str(database['session_id'][inds]) + "-" + str(database[table_name][inds]))
+      except Exception as ex:
+          pass
+      return ''.join(sestimelist)
+  
+  def target():
+      for inds in range(df_train.size):
+          if(df_train['target'][inds] == 1):
+              print("Сесия: {}".format(df_train['session_id']) + " Сайты: {}".format(df_train['site1'])+" / {}".format(df_train['site2'])+" / {}".format(df_train['site3'])+" / {}".format(df_train['site4'])+" / {}".format(df_train['site5'])+" / {}".format(df_train['site6'])+" / {}".format(df_train['site7'])+" / {}".format(df_train['site8'])+" / {}".format(df_train['site9'])+" / {}".format(df_train['site10']))
+  
+  def linrg():
+      # Загружаем данные только с двумя признаками
+      length = 10
+      x = np.arange(length, dtype=float).reshape((length, 1))
+      y = x + (np.random.rand(length) * 10).reshape((length, 1))
+  
+      x = x.reshape(length, 1)
+      y = y.reshape(length, 1)
+      regr = linear_model.LinearRegression()
+      regr.fit(x, y)
+  
+  
+      plt.scatter(x, y, color='black')
+      plt.plot(x, regr.predict(x), color='blue', linewidth=3)
+      plt.xticks(())
+      plt.yticks(())
+      plt.show()
+  
+  #Консольный бот для работы с приложением
+  if __name__ == '__main__':
+      print(Fore.GREEN +"------------------Запуск консольной панели для выполнения результатов------------------\n")
+      print(Fore.GREEN +"\nСписок возможностей:\n"
+            + "\n1 - Удалить строки имеющие пустые значения."
+            + "\n2 - Выполнить сортировку по файлу."
+            + "\n3 - Выполнить сортировку таблицы по столбцу 'session_id'"
+            + "\n4 - Отражение матрицы  (мешка сайтов)."
+            + "\n5 - Вывести имеются ли дубликаты в сессий сайта."
+            + "\n6 - Нарисовать график посещений сайта."
+            + "\n7 - Изминение вида даты в число ГГГГММ (Из всей таблицы)"
+            + "\n8 - Признак Сессия-Дата входа (Из всей таблицы)"
+            + "\n9 - Отражение матрицы (Рандомные значения) (мешка сайтов)."
+            + "\n10 - Сайты которые посещал злоумышленник."
+            + "\n11 - Выполнение линейной регрессии."
+            )
+      joined = input("Введите выбранный пункт:")
+      if(joined == "1"):
+          dropnulls()
+      if(joined == "2"):
+          sortdb()
+      if(joined == "3"):
+          sortsess()
+      if(joined == "4"):
+          dbcheck = input(Fore.CYAN +"Выберете Базу\n"
+                          +"\n1 - test_ses"
+                          +"\n2 - train_ses"
+                          + " :"
+                          )
+          if(dbcheck == "1"):
+              print(visitsits_dftest)
+              newmatrix1lists.clear()
+          if(dbcheck == "2"):
+              print(visitsits_dftrain)
+              newmatrix2lists.clear()
+      if(joined == "5"):
+          sutes_session_dub()
+      if(joined == "6"):
+          dbcheckplot = input(Fore.CYAN +"Выберете Базу\n"
+                          +"\n1 - test_ses"
+                          +"\n2 - train_ses"
+                          + " :"
+                          )
+          if(dbcheckplot == "1"):
+              sist_check_df_test()
+          if(sist_check_df_train == "2"):
+              sist_check_df_test()
+      if(joined == "7"):
+          dbchecks = input(Fore.CYAN +"Выберете Базу\n"
+                          +"\n1 - test_ses"
+                          +"\n2 - train_ses"
+                          + " :"
+                          )
+          if(dbchecks == "1"):
+              timesr = input("Введите название таблицы time's (Допустимые значения 'time1-time10')")
+              print(Fore.MAGENTA+new_time(df_test, timesr))
+          if(dbchecks == "2"):
+              timesr = input("Введите название таблицы time's (Допустимые значения 'time1-time10')")
+              print(Fore.MAGENTA+new_time(df_train, timesr))
+      if(joined == "8"):
+          dbchecks = input(Fore.CYAN +"Выберете Базу\n"
+                          +"\n1 - test_ses"
+                          +"\n2 - train_ses"
+                          + " :"
+                          )
+          if(dbchecks == "1"):
+              timesr = input("Введите название таблицы time's (Допустимые значения 'time1-time10')")
+              print(Fore.MAGENTA+ses_time(df_test, timesr))
+          if(dbchecks == "2"):
+              timesr = input("Введите название таблицы time's (Допустимые значения 'time1-time10')")
+              print(Fore.MAGENTA+ses_time(df_train, timesr))
+      if(joined == "9"):
+              visitsits_dftrain_rand()
+      if(joined == "10"):
+              target()
+      if(joined == "11"):
+              linrg()
+      if((joined != "1") and (joined != "2") and (joined != "3") and (joined != "4") and (joined != "5") and (joined != "6") and (joined != "7") and (joined != "8") and (joined != "9") and (joined != "10") and (joined != "11")):
+          print(Fore.RED+"Вы ввели неподдерживаемый символ."+Fore.BLUE+"\nПерезапустите программу.")
 </code>
 </pre>
 </div>
+  
 </body>
 </html>
